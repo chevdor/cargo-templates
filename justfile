@@ -3,11 +3,26 @@ _default:
   just --choose --chooser "fzf +s -x --tac --cycle"
 
 _init:
-    mkdir -p /tmp/cargo-templates
+  mkdir -p /tmp/cargo-templates
 
 # Test
 test template='cli' *args='': clean _init
-	cargo generate --path {{template}} --destination /tmp/cargo-templates {{ args }}
+  #!/usr/bin/env bash
+  cargo generate --path {{template}} --destination /tmp/cargo-templates {{ args }} --name aaa
+  cd /tmp/cargo-templates/aaa
+  cargo check
+  git config --local commit.gpgsign false
+  git add .; git commit -a -m "Initial commit"
+  cargo publish --dry-run
+
+test_web template='cli' *args='': clean _init
+  #!/usr/bin/env bash
+  cargo generate --destination /tmp/cargo-templates --git https://github.com/chevdor/cargo-templates.git {{template}}  --name bbb {{ args }} 
+  cd /tmp/cargo-templates/bbb
+  cargo check
+  git config --local commit.gpgsign false
+  git add .; git commit -a -m "Initial commit"
+  cargo publish --dry-run
 
 clean:
-    rm -rf /tmp/cargo-templates
+  rm -rf /tmp/cargo-templates

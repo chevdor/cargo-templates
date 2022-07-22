@@ -1,0 +1,7 @@
+[template]
+ignore = [
+  "target",
+  "*.lock"
+]
+
+[placeholders]

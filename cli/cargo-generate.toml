@@ -1,6 +1,7 @@
 [template]
-ignore = [ 
+ignore = [
   "target",
+  "*.lock",
 ]
 
 [placeholders]
