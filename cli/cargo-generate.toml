@@ -1,0 +1,7 @@
+[template]
+ignore = [ 
+  "target",
+]
+
+[placeholders]
+clap = { type = "bool", prompt = "Want to using clap?", default = true }
