@@ -17,7 +17,7 @@ test template='cli' *args='': clean _init
 
 test_web template='cli' *args='': clean _init
   #!/usr/bin/env bash
-  cargo generate --destination /tmp/cargo-templates --git https://github.com/chevdor/cargo-templates.git {{template}}  --name bbb {{ args }} 
+  cargo generate --destination /tmp/cargo-templates --git https://github.com/chevdor/cargo-templates.git {{template}}  --name bbb {{ args }}
   cd /tmp/cargo-templates/bbb
   cargo check
   git config --local commit.gpgsign false
@@ -26,3 +26,8 @@ test_web template='cli' *args='': clean _init
 
 clean:
   rm -rf /tmp/cargo-templates
+
+# Generate the readme as .md
+md:
+	#!/usr/bin/env bash
+	asciidoctor -b docbook -a leveloffset=+1 -o - README_src.adoc | pandoc   --markdown-headings=atx --wrap=preserve -t markdown_strict -f docbook - > README.md

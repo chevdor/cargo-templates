@@ -11,9 +11,21 @@ on:
 
 jobs:
   quick_check:
+    env:
+      TEST_TARGET: /tmp-tests
     strategy:
       matrix:
         os: ["ubuntu-latest"]
+        include:
+          - template: cli
+            clap: true
+          - template: cli
+            clap: false
+          - template: lib
+            # clap: n_a
+          - template: parity-lib
+            # clap: n_a
+
     runs-on: ${{ matrix.os }}
     steps:
       - name: Install Rust stable toolchain
@@ -25,7 +37,7 @@ jobs:
           components: clippy, rustfmt
 
       - name: Cache Dependencies & Build Outputs
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/.cargo/registry
@@ -33,26 +45,32 @@ jobs:
             target
           key: ${{ runner.os }}-${{ matrix.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - name: Cargo fmt
-        uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --all -- --check
+      - name: Install tollin
+        run: |
+          cargo install cargo-generate
+          cargo generate --version
 
-      - name: Cargo clippy
-        uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: -- -D warnings
+      - name: Generate test project for ${{ matrix.template }}
+        run: |
+          cargo generate --path ${{ matrix.template }} \
+            --destination $TEST_TARGET/${{ matrix.template }}-${{ matrix.clap }} \
+            --name "test-${{ matrix.template }}-${{ matrix.clap }}" \
+            --define clap=${{ matrix.clap }}
 
-      - name: Cargo test
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
+      - name: Cargo fmt for ${{ matrix.template }} / ${{ matrix.clap }}
+        working-directory: $TEST_TARGET/${{ matrix.template }}-${{ matrix.clap }}
+        run: cargo fmt --all -- --check
 
-      - name: Cargo check
-        uses: actions-rs/cargo@v1
-        with:
-          command: check
+      - name: Cargo clippy for ${{ matrix.template }} / ${{ matrix.clap }}
+        working-directory: $TEST_TARGET/${{ matrix.template }}-${{ matrix.clap }}
+        run: cargo clippy -- -D warnings
+
+      - name: Cargo test for ${{ matrix.template }} / ${{ matrix.clap }}
+        working-directory: $TEST_TARGET/${{ matrix.template }}-${{ matrix.clap }}
+        run: cargo test
+
+      - name: Cargo check for ${{ matrix.template }} / ${{ matrix.clap }}
+        working-directory: $TEST_TARGET/${{ matrix.template }}-${{ matrix.clap }}
+        run: cargo check
