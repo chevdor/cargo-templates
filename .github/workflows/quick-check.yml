@@ -46,8 +46,7 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            target
-          key: ${{ runner.os }}-${{ matrix.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-${{ matrix.os }}-cargo-${{ hashFiles('~/.cargo/**') }}
 
       - name: Install tolling
         run: |
@@ -60,8 +59,7 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            target
-          key: ${{ runner.os }}-${{ matrix.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-${{ matrix.os }}-cargo-${{ hashFiles('~/.cargo/**') }}
 
       - name: Prepare target
         run: |
@@ -79,12 +77,12 @@ jobs:
       - name: Cargo fmt for ${{ matrix.template }} / ${{ matrix.clap }}
         run: |
           cd "$TEST_TARGET/${{ matrix.template }}-${{ matrix.clap }}/$TEST_NAME"
-          cargo fmt --all -- --check
+          cargo +nightly fmt --all -- --check
 
       - name: Cargo clippy for ${{ matrix.template }} / ${{ matrix.clap }}
         run: |
           cd "$TEST_TARGET/${{ matrix.template }}-${{ matrix.clap }}/$TEST_NAME"
-          cargo clippy -- -D warnings
+          cargo +nightly clippy -- -D warnings
 
       - name: Cargo test for ${{ matrix.template }} / ${{ matrix.clap }}
         run: |
