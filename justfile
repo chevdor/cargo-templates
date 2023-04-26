@@ -8,7 +8,7 @@ _init:
 # Test
 test template='cli' *args='': clean _init
   #!/usr/bin/env bash
-  cargo generate --path {{template}} --destination /tmp/cargo-templates {{ args }} --name aaa
+  cargo generate --path {{template}} --destination /tmp/cargo-templates {{ args }} --name aaa -d clap=true
   cd /tmp/cargo-templates/aaa
   cargo check
   git config --local commit.gpgsign false
