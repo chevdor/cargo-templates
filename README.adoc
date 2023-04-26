@@ -3,3 +3,7 @@
 Here is how to test one template:
 
     just test cli
+
+== Usage
+
+    cargo generate --git https://github.com/chevdor/cargo-templates --destination /projects/
